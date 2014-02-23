@@ -475,6 +475,7 @@
 				A2E470FE18BA493E007095A7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A2E470FF18BA493E007095A7 /* Build configuration list for PBXNativeTarget "19ViewsTestHW02Tests" */ = {
 			isa = XCConfigurationList;
@@ -483,6 +484,7 @@
 				A2E4710118BA493E007095A7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
