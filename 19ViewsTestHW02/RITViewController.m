@@ -11,6 +11,12 @@
 @interface RITViewController ()
 
 @property (strong, nonatomic) UIView* chessboard;
+@property (assign, nonatomic) NSUInteger borderOffset;
+@property (assign, nonatomic) NSUInteger cellCount;
+@property (assign, nonatomic) NSUInteger screenMin;
+@property (assign, nonatomic) NSUInteger screenMax;
+@property (assign, nonatomic) NSUInteger cellSize;
+@property (assign, nonatomic) NSUInteger fieldSize;
 
 @end
 
@@ -19,6 +25,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    [self initializeProperties];
     
     [self drawChessboard];
 }
@@ -43,66 +51,75 @@
 
 }
 
-- (void) drawChessboard {
-    CGRect rect;
-    UIView *view =  nil;
-    UIView *whiteBox =  nil;
-    NSUInteger cellCount        = 8;
-    NSUInteger borderOffset     = 2;
-    NSUInteger minimumSize      = MIN(CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame));
-    NSUInteger maximumSize      = MAX(CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame));
+#pragma mark - Helper methods
+
+- (void) initializeProperties {
+    
+    self.borderOffset           = 20;
+    self.cellCount              = 8;
+    self.screenMin              = MIN(CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame));
+    self.screenMax              = MAX(CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame));
     
     // calculate cell size and field size
-    NSUInteger cellSize         = (minimumSize - borderOffset * 2) / cellCount;
-    NSUInteger fieldSize        = cellSize * cellCount + borderOffset * 2;
-    
+    self.cellSize               = (self.screenMin - self.borderOffset * 2 - 4) / self.cellCount;
+    self.fieldSize              = self.cellSize * self.cellCount + 4;
+}
+
+- (void) drawChessboard {
     // set initial coordinates
+    CGRect rect;
     NSUInteger x = 0;
     NSUInteger y = 0;
     if (CGRectGetWidth(self.view.bounds) < CGRectGetHeight(self.view.bounds)) {
         // portrait or upside down
-        x = (minimumSize - fieldSize) / 2;
-        y = (maximumSize - minimumSize) / 2;
+        x = (self.screenMin - self.fieldSize) / 2;
+        y = (self.screenMax - self.screenMin) / 2;
     } else {
         // landscape (left or right)
-        x = (maximumSize - minimumSize) / 2;
-        y = (minimumSize - fieldSize) / 2;
+        x = (self.screenMax - self.screenMin) / 2;
+        y = (self.screenMin - self.fieldSize) / 2;
     }
     
-    // set border
-    rect                        = CGRectMake(x, y, fieldSize, fieldSize);
-    self.chessboard             = [[UIView alloc] initWithFrame:rect];
-    self.chessboard.backgroundColor    = [UIColor blackColor];
+    // set border (black box)
+    rect = CGRectMake(x, y, self.fieldSize, self.fieldSize);
+    self.chessboard = [[UIView alloc] initWithFrame:rect];
+    self.chessboard.backgroundColor = [UIColor blackColor];
+    self.chessboard.autoresizingMask =  UIViewAutoresizingFlexibleTopMargin |
+    UIViewAutoresizingFlexibleRightMargin |
+    UIViewAutoresizingFlexibleBottomMargin |
+    UIViewAutoresizingFlexibleLeftMargin;
     [self.view addSubview:self.chessboard];
     
+    // set white box
     rect                        = CGRectMake(
-                                             borderOffset / 2,
-                                             borderOffset / 2,
-                                             CGRectGetWidth(rect) - borderOffset,
-                                             CGRectGetHeight(rect) - borderOffset
+                                             1,
+                                             1,
+                                             CGRectGetWidth(rect) - 2,
+                                             CGRectGetWidth(rect) - 2
                                              );
     
-    whiteBox                    = [[UIView alloc] initWithFrame:rect];
-    whiteBox.backgroundColor  = [UIColor whiteColor];
+    UIView* whiteBox            = [[UIView alloc] initWithFrame:rect];
+    whiteBox.backgroundColor    = [UIColor whiteColor];
     [self.chessboard addSubview:whiteBox];
     
     // draw cells
-    y       = 1;
-    for (int i = 0; i < cellCount; i++) {
+    UIView *view =  nil;
+    y = 1;
+    for (int i = 0; i < self.cellCount; i++) {
         
-        x = cellSize * (i % 2) + 1;
+        x = self.cellSize * (i % 2) + 1;
         
-        for (int j = 0; j < cellCount / 2; j++) {
+        for (int j = 0; j < self.cellCount / 2; j++) {
             
-            rect                    = CGRectMake(x, y, cellSize, cellSize);
+            rect                    = CGRectMake(x, y, self.cellSize, self.cellSize);
             view                    = [[UIView alloc] initWithFrame:rect];
             view.backgroundColor    = [UIColor blackColor];
             [whiteBox addSubview:view];
             
-            x+= cellSize * 2;
+            x+= self.cellSize * 2;
         }
         
-        y+= cellSize;
+        y+= self.cellSize;
     }
 }
 
